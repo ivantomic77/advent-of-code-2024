@@ -10,12 +10,15 @@ import (
 )
 
 func main() {
-	// Bruteforced PT.1. TODO: Refactor
-	safeLevels := loadSafeData()
-	fmt.Printf("Number of safe reports: %d", len(safeLevels))
+	// Bruteforced TODO: Refactor
+	safeLevels := loadSafeData(false)
+	fmt.Printf("Number of safe reports: %d\n", len(safeLevels))
+
+	safeLevels1 := loadSafeData(true)
+	fmt.Printf("Number of safe reports with Safety: %d", len(safeLevels1))
 }
 
-func loadSafeData() [][]int {
+func loadSafeData(hasSafety bool) [][]int {
 	file, err := os.Open("input.txt")
 	if err != nil {
 		panic(err)
@@ -29,7 +32,6 @@ func loadSafeData() [][]int {
 	for scanner.Scan() {
 		line := scanner.Text()
 		stringListItems := strings.Split(line, " ")
-
 		var listItems []int
 		for _, str := range stringListItems {
 			num, err := strconv.Atoi(str)
@@ -40,18 +42,35 @@ func loadSafeData() [][]int {
 			listItems = append(listItems, num)
 		}
 
-		isListSafe, _ := isSafe(listItems)
+		isListSafe, index := isSafe(listItems)
+
 		if isListSafe {
 			safeLists = append(safeLists, listItems)
+			continue
+		}
+
+		if hasSafety {
+			for i := index - 1; i < index+2; i++ {
+				if i < 0 || i > len(listItems)-1 {
+					continue
+				}
+				tempList := make([]int, len(listItems))
+				copy(tempList, listItems)
+				tempList = removeElement(tempList, i)
+
+				if safe, _ := isSafe(tempList); safe {
+					safeLists = append(safeLists, listItems)
+					break
+				}
+			}
 		}
 	}
-
 	return safeLists
 }
 
-// func removeElement(slice []int, index int) []int {
-// 	return append(slice[:index], slice[index+1:]...)
-// }
+func removeElement(slice []int, index int) []int {
+	return append(slice[:index], slice[index+1:]...)
+}
 
 func isSafe(listItems []int) (bool, int) {
 	if len(listItems) == 2 {
@@ -68,13 +87,11 @@ func isSafe(listItems []int) (bool, int) {
 		currentDirection := getDirection(listItems[i], listItems[i+1])
 
 		if currentDirection != direction {
-			fmt.Printf("DIR: %v\n%d\n\n", listItems, i)
 			return false, i
 		}
 
 		diff := int(math.Abs(float64(listItems[i] - listItems[i+1])))
 		if diff < 1 || diff > 3 {
-			fmt.Printf("DIFF: %v\n%d\n\n", listItems, i)
 			return false, i
 		}
 	}
