@@ -42,7 +42,7 @@ func loadSafeData(hasSafety bool) [][]int {
 			listItems = append(listItems, num)
 		}
 
-		isListSafe, index := isSafe(listItems)
+		isListSafe, errIndex := isSafe(listItems)
 
 		if isListSafe {
 			safeLists = append(safeLists, listItems)
@@ -50,7 +50,7 @@ func loadSafeData(hasSafety bool) [][]int {
 		}
 
 		if hasSafety {
-			for i := index - 1; i < index+2; i++ {
+			for i := errIndex - 1; i < errIndex+2; i++ {
 				if i < 0 || i > len(listItems)-1 {
 					continue
 				}
