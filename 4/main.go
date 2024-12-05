@@ -11,12 +11,15 @@ import (
 func main() {
 	input := getInput()
 
-	foundWords := checkForWords(input)
+	foundWords := checkForWordsPt1(input)
 	fmt.Printf("Result Pt. 1: %d\n", foundWords)
+
+	foundWords = checkForWordsPt2(input)
+	fmt.Printf("Result Pt. 2: %d\n", foundWords)
 }
 
 // refactor to be O(1) Space
-func checkForWords(input [][]string) int {
+func checkForWordsPt1(input [][]string) int {
 	x := [8]int{-1, -1, -1, 0, 0, 1, 1, 1}
 	y := [8]int{-1, 0, 1, -1, 1, -1, 0, 1}
 
@@ -43,6 +46,29 @@ func checkForWords(input [][]string) int {
 
 				if len(word) == 4 {
 					totalWords += findWords(word)
+				}
+			}
+		}
+	}
+
+	return totalWords
+}
+
+func checkForWordsPt2(input [][]string) int {
+	totalWords := 0
+
+	rows := len(input)
+	cols := len(input[0])
+
+	// Search 2D array excluding wall A characters
+	for i := 1; i < rows-1; i++ {
+		for j := 1; j < cols-1; j++ {
+			// if A is found try to find MAS in both diagonals
+			if input[i][j] == "A" {
+				if (input[i-1][j-1] == "M" && input[i+1][j+1] == "S") || input[i-1][j-1] == "S" && input[i+1][j+1] == "M" {
+					if (input[i+1][j-1] == "M" && input[i-1][j+1] == "S") || input[i+1][j-1] == "S" && input[i-1][j+1] == "M" {
+						totalWords++
+					}
 				}
 			}
 		}
